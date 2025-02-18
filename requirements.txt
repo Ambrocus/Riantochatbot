@@ -2,3 +2,4 @@ gradio
 huggingface_hub
 transformers
 torch
+gunicorn

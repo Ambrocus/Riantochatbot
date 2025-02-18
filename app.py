@@ -35,7 +35,7 @@ client = InferenceClient("HuggingFaceH4/zephyr-7b-beta")
     
     for question in creator_questions:
         if question in input_text.lower():
-            return "I was created by Nicholas Levi Rianto!"
+            return "I was created by Nicholas Levi Rianto!!"
 
     # If no recipe or creator question is found, return a generic response
     return "I can help you with recipes! Just ask for a specific dish."

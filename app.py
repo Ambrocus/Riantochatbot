@@ -24,6 +24,9 @@ def internal_error(error):
 # Initialize Hugging Face Inference Client
 client = InferenceClient("HuggingFaceH4/zephyr-7b-beta")
 
+def chatbot(input_text):
+    """Handles basic questions and recipe responses."""
+    
     # If the user asks about the creator
     creator_questions = [
         "who created you",

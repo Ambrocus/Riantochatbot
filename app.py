@@ -16,7 +16,8 @@ def chat():
     user_input = request.json.get('message')
     response = respond(user_input)
     return jsonify({"response": response})
-    @app.errorhandler(500)
+    
+@app.errorhandler(500)
 def internal_error(error):
     return "An internal error occurred.", 500
 
@@ -27,11 +28,6 @@ def chatbot(input_text):
     # Welcome message for empty input
     if not input_text.strip():
         return "Welcome to Nico Chatbot! I'm here to help you cook delicious meals."
-
-    # Check if the input matches any recipe key
-    for key in recipes:
-        if key.lower() in input_text.lower():
-            return recipes[key]
 
     # If the user asks about the creator
     creator_questions = [
@@ -53,9 +49,6 @@ def chatbot(input_text):
     for key in recipes:
         if key.lower() in input_text.lower():
             return recipes[key]
-    
-    # If no recipe is found, return a generic response
-    return "I can help you with recipes! Just ask for a specific dish."
 
 def respond(
     message,

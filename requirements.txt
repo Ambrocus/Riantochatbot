@@ -3,3 +3,5 @@ huggingface_hub
 transformers
 torch
 gunicorn
+flask
+your-chatbot-library

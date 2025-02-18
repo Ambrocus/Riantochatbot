@@ -1,6 +1,24 @@
 import gradio as gr
 from huggingface_hub import InferenceClient
 from recipes import recipes  # Import recipes dictionary
+from flask import Flask, request, jsonify
+import os
+
+app = Flask(__name__)
+app.config['API_KEY'] = os.getenv('API_KEY')
+from chatbot import respond
+@app.route('/')
+def home():
+    return "Hello, this is your chatbot!"
+
+@app.route('/chat', methods=['POST'])
+def chat():
+    user_input = request.json.get('message')
+    response = respond(user_input)
+    return jsonify({"response": response})
+    @app.errorhandler(500)
+def internal_error(error):
+    return "An internal error occurred.", 500
 
 # Initialize Hugging Face Inference Client
 client = InferenceClient("HuggingFaceH4/zephyr-7b-beta")
@@ -98,4 +116,4 @@ demo = gr.ChatInterface(
 )
 
 if __name__ == "__main__":
-    demo.launch()
+    app.run(host='0.0.0.0', port=5000)

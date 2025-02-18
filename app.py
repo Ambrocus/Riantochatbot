@@ -24,11 +24,6 @@ def internal_error(error):
 # Initialize Hugging Face Inference Client
 client = InferenceClient("HuggingFaceH4/zephyr-7b-beta")
 
-def chatbot(input_text):
-    # Welcome message for empty input
-    if not input_text.strip():
-        return "Welcome to Nico Chatbot! I'm here to help you cook delicious meals."
-
     # If the user asks about the creator
     creator_questions = [
         "who created you",

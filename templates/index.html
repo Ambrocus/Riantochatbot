@@ -3,27 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rianto ChatBot</title>
-    <link rel="stylesheet" href="static/styles.css">
+    <title>RiantoChatBot</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
     <div class="chat-container">
-        <div class="chat-header">
-            <h2>RiantoChatBot</h2>
-        </div>
+        <h1>RiantoChatBot</h1>
+
+        <!-- Chat Box -->
         <div class="chat-box" id="chat-box">
             <div class="message received">
                 <p>Hello! Welcome to RiantoChatBot, how can I help?</p>
             </div>
         </div>
 
+        <!-- User Input -->
         <div class="input-container">
             <input type="text" id="user-input" placeholder="Type your message..." />
-            <button id="send-btn">➤</button>
+            <button id="send-btn">▶</button>
+        </div>
+
+        <!-- Answer Box (Where Bot answers will be displayed) -->
+        <div class="answer-box" id="answer-box">
+            <div id="answer">Bot's response will appear here...</div>
         </div>
     </div>
 
-    <script src="static/script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

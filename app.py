@@ -9,7 +9,7 @@ app.config['API_KEY'] = os.getenv('API_KEY')
 from chatbot import respond
 @app.route('/')
 def home():
-    return "Hello, this is your chatbot!"
+    return render_template('index.html')
 
 @app.route('/chat', methods=['POST'])
 def chat():

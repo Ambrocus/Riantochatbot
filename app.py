@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS  # Add this import
 import os
 from chatbot import respond
+from huggingface_hub import InferenceClient  # Add this import
+
 
 app = Flask(__name__)
 CORS(app)  # Add this line to enable CORS for all routes

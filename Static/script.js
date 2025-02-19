@@ -29,3 +29,4 @@ document.getElementById('user-input').addEventListener('keydown', function(e) {
         document.getElementById('send-btn').click();
     }
 });
+

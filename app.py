@@ -1,12 +1,13 @@
-import gradio as gr
-from huggingface_hub import InferenceClient
-from recipes import recipes  # Import recipes dictionary
 from flask import Flask, render_template, request, jsonify
+from flask_cors import CORS  # Add this import
 import os
+from chatbot import respond
 
 app = Flask(__name__)
+CORS(app)  # Add this line to enable CORS for all routes
+
 app.config['API_KEY'] = os.getenv('API_KEY')
-from chatbot import respond
+
 @app.route('/')
 def home():
     with app.app_context():
@@ -17,7 +18,7 @@ def chat():
     user_input = request.json.get('message')
     response = respond(user_input)
     return jsonify({"response": response})
-    
+
 @app.errorhandler(500)
 def internal_error(error):
     return "An internal error occurred.", 500
@@ -26,28 +27,11 @@ def internal_error(error):
 client = InferenceClient("HuggingFaceH4/zephyr-7b-beta")
 
 def chatbot(input_text):
-    """Handles basic questions and recipe responses."""
-    
-    # If the user asks about the creator
-    creator_questions = [
-        "who created you",
-        "who made you",
-        "who is your creator",
-        "who developed you",
-        "who is your creator"
-    ]
-    
-    for question in creator_questions:
-        if question in input_text.lower():
-            return "I was created by Nicholas Levi Rianto!!"
-
-    # If no recipe or creator question is found, return a generic response
-    return "I can help you with recipes! Just ask for a specific dish."
-    
     # Check if the input matches any recipe key
     for key in recipes:
         if key.lower() in input_text.lower():
             return recipes[key]
+    return "I can help you with recipes! Just ask for a specific dish."
 
 def respond(
     message,
@@ -57,13 +41,11 @@ def respond(
     temperature,
     top_p,
 ):
-    # Check if the message is related to recipes
     recipe_response = chatbot(message)
     if recipe_response != "I can help you with recipes! Just ask for a specific dish.":
         yield recipe_response
         return
 
-    # Prepare messages for the Hugging Face model
     messages = [{"role": "system", "content": system_message}]
 
     for user_msg, assistant_msg in history:
@@ -74,7 +56,6 @@ def respond(
 
     messages.append({"role": "user", "content": message})
 
-    # Stream response from Hugging Face model
     response = ""
     try:
         for message in client.chat_completion(
@@ -89,23 +70,6 @@ def respond(
             yield response
     except Exception as e:
         yield f"An error occurred: {str(e)}"
-
-# Gradio ChatInterface
-demo = gr.ChatInterface(
-    respond,
-    additional_inputs=[
-        gr.Textbox(value="You are a friendly Chatbot.", label="System message"),
-        gr.Slider(minimum=1, maximum=2048, value=512, step=1, label="Max new tokens"),
-        gr.Slider(minimum=0.1, maximum=4.0, value=0.7, step=0.1, label="Temperature"),
-        gr.Slider(
-            minimum=0.1,
-            maximum=1.0,
-            value=0.95,
-            step=0.05,
-            label="Top-p (nucleus sampling)",
-        ),
-    ],
-)
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=10000)

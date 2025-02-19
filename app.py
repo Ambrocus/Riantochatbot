@@ -1,7 +1,7 @@
 import gradio as gr
 from huggingface_hub import InferenceClient
 from recipes import recipes  # Import recipes dictionary
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 import os
 
 app = Flask(__name__)

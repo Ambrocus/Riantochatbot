@@ -1,7 +1,7 @@
 import gradio as gr
 from huggingface_hub import InferenceClient
 from recipes import recipes  # Import recipes dictionary
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, render_template, request, jsonify
 import os
 
 app = Flask(__name__)
@@ -9,7 +9,8 @@ app.config['API_KEY'] = os.getenv('API_KEY')
 from chatbot import respond
 @app.route('/')
 def home():
-    return render_template('index.html')
+    return 
+render_template('index.html')
 
 @app.route('/chat', methods=['POST'])
 def chat():

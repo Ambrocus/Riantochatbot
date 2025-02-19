@@ -1,32 +1,34 @@
-document.getElementById('send-btn').addEventListener('click', function() {
+document.getElementById('send-btn').addEventListener('click', sendMessage);
+document.getElementById('user-input').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') sendMessage();
+});
+
+function sendMessage() {
     const inputField = document.getElementById('user-input');
     const userMessage = inputField.value.trim();
 
     if (userMessage) {
-        // Add user message to the chat
-        const userMessageElement = document.createElement('div');
-        userMessageElement.classList.add('message', 'sent');
-        userMessageElement.innerHTML = `<p>${userMessage}</p>`;
-        document.getElementById('chat-box').appendChild(userMessageElement);
+        appendMessage(userMessage, 'sent');
 
-        // Add bot response (simple example)
-        const botMessageElement = document.createElement('div');
-        botMessageElement.classList.add('message', 'received');
-        botMessageElement.innerHTML = `<p>Received: ${userMessage}</p>`; // You can replace this with real logic or API calls
-        document.getElementById('chat-box').appendChild(botMessageElement);
+        // Simulated bot response (Replace this with actual API call or response logic)
+        setTimeout(() => {
+            appendMessage("I'm here to help!", 'received');
+        }, 1000);
 
-        // Scroll to bottom
-        document.getElementById('chat-box').scrollTop = document.getElementById('chat-box').scrollHeight;
-
-        // Clear input field
         inputField.value = '';
+        scrollChatToBottom();
     }
-});
+}
 
-// Optional: Allow pressing "Enter" to send the message
-document.getElementById('user-input').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') {
-        document.getElementById('send-btn').click();
-    }
-});
+function appendMessage(message, type) {
+    const chatBox = document.getElementById('chat-box');
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('message', type);
+    messageElement.innerHTML = `<p>${message}</p>`;
+    chatBox.appendChild(messageElement);
+}
 
+function scrollChatToBottom() {
+    const chatBox = document.getElementById('chat-box');
+    chatBox.scrollTop = chatBox.scrollHeight;
+}

@@ -1,77 +1,62 @@
 from flask import Flask, render_template, request, jsonify
-from flask_cors import CORS  # Add this import
+from flask_cors import CORS
 import os
-from chatbot import respond
-from huggingface_hub import InferenceClient  # Add this import
-
+from huggingface_hub import InferenceClient  # Ensure this is correctly imported
 
 app = Flask(__name__)
-CORS(app)  # Add this line to enable CORS for all routes
-
-app.config['API_KEY'] = os.getenv('API_KEY')
-
-@app.route('/')
-def home():
-    with app.app_context():
-        return render_template('index.html')
-
-@app.route('/chat', methods=['POST'])
-def chat():
-    user_input = request.json.get('message')
-    response = respond(user_input)
-    return jsonify({"response": response})
-
-@app.errorhandler(500)
-def internal_error(error):
-    return "An internal error occurred.", 500
+CORS(app)  # Enable CORS for all routes
 
 # Initialize Hugging Face Inference Client
 client = InferenceClient("HuggingFaceH4/zephyr-7b-beta")
 
-def chatbot(input_text):
-    # Check if the input matches any recipe key
-    for key in recipes:
-        if key.lower() in input_text.lower():
-            return recipes[key]
-    return "I can help you with recipes! Just ask for a specific dish."
+@app.route('/')
+def home():
+    return render_template('index.html')
 
-def respond(
-    message,
-    history: list[tuple[str, str]],
-    system_message,
-    max_tokens,
-    temperature,
-    top_p,
-):
-    recipe_response = chatbot(message)
-    if recipe_response != "I can help you with recipes! Just ask for a specific dish.":
-        yield recipe_response
-        return
-
-    messages = [{"role": "system", "content": system_message}]
-
-    for user_msg, assistant_msg in history:
-        if user_msg:
-            messages.append({"role": "user", "content": user_msg})
-        if assistant_msg:
-            messages.append({"role": "assistant", "content": assistant_msg})
-
-    messages.append({"role": "user", "content": message})
-
-    response = ""
+@app.route('/chat', methods=['POST'])
+def chat():
     try:
-        for message in client.chat_completion(
-            messages,
-            max_tokens=max_tokens,
-            stream=True,
-            temperature=temperature,
-            top_p=top_p,
-        ):
-            token = message.choices[0].delta.content
-            response += token
-            yield response
+        # Debugging: Print the incoming request
+        print("Received a request to /chat")
+
+        # Get user input from JSON request
+        data = request.get_json()
+        if not data or 'message' not in data:
+            print("Error: No message provided in request")
+            return jsonify({"response": "Please send a valid message."}), 400
+
+        user_input = data['message']
+        print(f"User Input: {user_input}")  # Debugging log
+
+        # Generate response from Hugging Face model
+        response = get_ai_response(user_input)
+        print(f"AI Response: {response}")  # Debugging log
+
+        return jsonify({"response": response})
+    
     except Exception as e:
-        yield f"An error occurred: {str(e)}"
+        print(f"Error occurred: {str(e)}")  # Print error to logs
+        return jsonify({"response": f"Internal error: {str(e)}"}), 500  # Return error details
+
+@app.errorhandler(500)
+def internal_error(error):
+    print("Internal Server Error:", error)  # Log the error
+    return jsonify({"response": "An internal error occurred."}), 500
+
+def get_ai_response(message):
+    """
+    Uses the Hugging Face model to generate a chatbot response.
+    """
+    try:
+        print("Sending request to Hugging Face API...")  # Debugging log
+        response = client.text_generation(message, max_new_tokens=100)  # Correct API call
+        print("Response received from Hugging Face API:", response)  # Debugging log
+        return response
+    except Exception as e:
+        print(f"Error calling Hugging Face API: {str(e)}")  # Log error
+        return "I'm having trouble responding right now."
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=10000)
+    port = int(os.environ.get("PORT", 10000))  # Dynamically set port
+    print(f"Starting Flask app on port {port}...")  # Debugging log
+    app.run(host='0.0.0.0', port=port, debug=True)

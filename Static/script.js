@@ -1,34 +1,27 @@
-document.getElementById('send-btn').addEventListener('click', sendMessage);
-document.getElementById('user-input').addEventListener('keydown', function (e) {
-    if (e.key === 'Enter') sendMessage();
-});
-
 function sendMessage() {
     const inputField = document.getElementById('user-input');
     const userMessage = inputField.value.trim();
 
-    if (userMessage) {
-        appendMessage(userMessage, 'sent');
+    if (!userMessage) return;  // If input is empty, do nothing
 
-        // Simulated bot response (Replace this with actual API call or response logic)
-        setTimeout(() => {
-            appendMessage("I'm here to help!", 'received');
-        }, 1000);
+    // Append user message to chat
+    appendMessage(userMessage, 'sent');
 
-        inputField.value = '';
-        scrollChatToBottom();
-    }
-}
+    // 🔥 This is the fetch() function that sends data to the backend
+    fetch('https://lazychat.onrender.com/chat', {  
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userMessage }),  // Send user input
+    })
+    .then(response => response.json())  // Convert response to JSON
+    .then(data => {
+        console.log('Bot response:', data);  // Debugging log
+        appendMessage(data.response, 'received');  // Display bot response
+    })
+    .catch(error => {
+        console.error('Error:', error);  // Debugging error log
+        appendMessage("Sorry, I couldn't process that. Please try again.", 'received');
+    });
 
-function appendMessage(message, type) {
-    const chatBox = document.getElementById('chat-box');
-    const messageElement = document.createElement('div');
-    messageElement.classList.add('message', type);
-    messageElement.innerHTML = `<p>${message}</p>`;
-    chatBox.appendChild(messageElement);
-}
-
-function scrollChatToBottom() {
-    const chatBox = document.getElementById('chat-box');
-    chatBox.scrollTop = chatBox.scrollHeight;
+    inputField.value = '';  // Clear input field after sending
 }

@@ -16,19 +16,13 @@ def home():
 @app.route('/chat', methods=['POST'])
 def chat():
     try:
-        # Debugging: Print the incoming request
-        print("Received a request to /chat")
-
-        # Get user input from JSON request
         data = request.get_json()
         if not data or 'message' not in data:
-            print("Error: No message provided in request")
             return jsonify({"response": "Please send a valid message."}), 400
 
         user_input = data['message']
         print(f"User Input: {user_input}")  # Debugging log
 
-        # Generate response from Hugging Face model
         response = get_ai_response(user_input)
         print(f"AI Response: {response}")  # Debugging log
 
